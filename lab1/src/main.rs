@@ -4,5 +4,5 @@ mod utils;
 mod tests_helper;
 
 fn main() {
-    start_rules_additioner().expect("panic");
+    start_rules_additioner();
 }
