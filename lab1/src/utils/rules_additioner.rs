@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
+use log::{info, warn, error};
 
 #[derive(Debug)]
 struct RulesAddition {
@@ -29,14 +30,14 @@ impl RulesAddition {
     }
 
     fn read_letters(&mut self) {
-        println!("Trying to open file data/alphabet.txt");
+        info!("Trying to open file data/alphabet.txt");
         let file = match File::open("data/alphabet.txt") {
             Ok(f) => {
-                println!("File data/alphabet.txt opened successfully");
+                info!("File data/alphabet.txt opened successfully");
                 f
             }
             Err(e) => {
-                println!("Error while open file {e}");
+                error!("Error while open file {e}");
                 self.error = true;
                 return;
             }
@@ -50,7 +51,7 @@ impl RulesAddition {
                     Ok(n) => self.max_len = n,
                     Err(e) => {
                         self.error = true;
-                        println!("Parse max len with error: {e}");
+                        error!("Parse max len with error: {e}");
                         return;
                     }
                 }
@@ -76,14 +77,14 @@ impl RulesAddition {
     }
 
     fn read_rules(&mut self) {
-        println!("Trying to open file data/rules.txt");
+        info!("Trying to open file data/rules.txt");
         let file = match File::open("data/rules.txt") {
             Ok(f) => {
-                println!("File data/rules.txt opened successfully");
+                info!("File data/rules.txt opened successfully");
                 f
             }
             Err(e) => {
-                println!("Error while open file {e}");
+                error!("Error while open file {e}");
                 self.error = true;
                 return;
             }
@@ -92,7 +93,7 @@ impl RulesAddition {
         let reader = BufReader::new(file);
         self.left_rules.clear();
         self.right_rules.clear();
-        println!("-------------SRS----------------");
+        info!("-------------SRS----------------");
         for line in reader.lines() {
             let rule = line.unwrap();
             if rule.is_empty() {
@@ -104,11 +105,11 @@ impl RulesAddition {
                 if right == "." {
                     right = ""
                 }
-                println!("{} -> {}", left, right);
+                info!("{} -> {}", left, right);
                 self.add_rules(left, right)
             }
         }
-        println!("--------------------------------");
+        info!("--------------------------------");
     }
 
     fn add_rules(&mut self, left_rule: &str, right_rule: &str) {
@@ -207,15 +208,16 @@ impl RulesAddition {
 }
 
 pub fn start_rules_additioner() {
+    env_logger::init();
     let mut rules_addition = RulesAddition::new();
     rules_addition.read_letters();
     if rules_addition.error {
         return;
     }
-    println!("Letters read");
+    info!("Letters read");
 
     rules_addition.read_rules();
-    println!("Rules read");
+    info!("Rules read");
 
     rules_addition.reduction_rules();
 
@@ -233,9 +235,9 @@ pub fn start_rules_additioner() {
                 let normal_forms = rules_addition.get_normal_forms(&gen_string, vec![]);
                 if normal_forms.len() != 1 {
                     cnt += 1;
-                    println!("{gen_string} has more, than 1 normal form");
+                    warn!("{gen_string} has more, than 1 normal form");
                     for (key, val) in &rules_addition.history {
-                        println!("{}: {:?}", key, val)
+                        info!("{}: {:?}", key, val)
                     }
                     let mut sorted_normal_forms = normal_forms.clone();
                     sorted_normal_forms.sort_by(|a, b| {
@@ -249,17 +251,17 @@ pub fn start_rules_additioner() {
                         to_add.insert(pair[1].clone(), pair[0].clone());
                     }
                 } else {
-                    println!("{} norm: {} -> {}", gen_string, gen_string, normal_forms[0]);
+                    info!("{} norm: {} -> {}", gen_string, gen_string, normal_forms[0]);
                 }
             }
 
             if cnt == 0 {
-                println!("My job finished! Goodbye!");
+                info!("My job finished! Goodbye!");
                 break;
             }
 
             for (key, val) in &to_add {
-                println!("Added rule {key} -> {val}")
+                info!("Added rule {key} -> {val}")
             }
 
             if to_add.is_empty() {
@@ -285,7 +287,7 @@ pub fn start_rules_additioner() {
                 } else {
                     writeln!(file, "{} -> .", left).unwrap();
                 }
-                println!("{} -> {} written", left, right);
+                info!("{} -> {} written", left, right);
             }
 
             rules_addition.read_rules();
