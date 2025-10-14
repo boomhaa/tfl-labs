@@ -225,7 +225,7 @@ pub fn start_rules_additioner() {
     let mut to_add: HashMap<String, String> = HashMap::new();
 
     while rules_addition.cur_len <= rules_addition.max_len {
-        loop {
+        'new: loop {
             for i in 0..rules_addition
                 .alphabet_len
                 .pow(rules_addition.cur_len as u32)
@@ -235,9 +235,11 @@ pub fn start_rules_additioner() {
                 let normal_forms = rules_addition.get_normal_forms(&gen_string, vec![]);
                 if normal_forms.len() != 1 {
                     cnt += 1;
-                    warn!("{gen_string} has more, than 1 normal form");
-                    for (key, val) in &rules_addition.history {
-                        info!("{}: {:?}", key, val)
+                    if gen_string == "ccc" {
+                        warn!("{gen_string} has more, than 1 normal form");
+                        for (key, val) in &rules_addition.history {
+                            info!("{}: {:?}", key, val)
+                        }
                     }
                     let mut sorted_normal_forms = normal_forms.clone();
                     sorted_normal_forms.sort_by(|a, b| {
@@ -250,18 +252,20 @@ pub fn start_rules_additioner() {
                     for pair in sorted_normal_forms.windows(2) {
                         to_add.insert(pair[1].clone(), pair[0].clone());
                     }
+                    rules_addition.cur_len = 0;
+                    break 'new;
                 } else {
-                    info!("{} norm: {} -> {}", gen_string, gen_string, normal_forms[0]);
+                    //info!("{} norm: {} -> {}", gen_string, gen_string, normal_forms[0]);
                 }
             }
 
             if cnt == 0 {
-                info!("My job finished! Goodbye!");
+                //info!("My job finished! Goodbye!");
                 break;
             }
 
             for (key, val) in &to_add {
-                info!("Added rule {key} -> {val}")
+                //info!("Added rule {key} -> {val}")
             }
 
             if to_add.is_empty() {
@@ -287,7 +291,7 @@ pub fn start_rules_additioner() {
                 } else {
                     writeln!(file, "{} -> .", left).unwrap();
                 }
-                info!("{} -> {} written", left, right);
+                //info!("{} -> {} written", left, right);
             }
 
             rules_addition.read_rules();

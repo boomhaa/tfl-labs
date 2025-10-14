@@ -1,8 +1,10 @@
 use crate::tests_helper::fuzz_tests::start_fuzzer;
+use crate::utils::rules_additioner::start_rules_additioner;
 
 mod utils;
 mod tests_helper;
 
 fn main() {
-    start_fuzzer();
+    start_rules_additioner()
+    //start_fuzzer();
 }
