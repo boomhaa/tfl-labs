@@ -1,7 +1,7 @@
-use std::collections::HashMap;
+use log::{error, info, warn};
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
-use log::{info, warn, error};
 
 #[derive(Debug)]
 struct RulesAddition {
@@ -93,7 +93,7 @@ impl RulesAddition {
         let reader = BufReader::new(file);
         self.left_rules.clear();
         self.right_rules.clear();
-        info!("-------------SRS----------------");
+
         for line in reader.lines() {
             let rule = line.unwrap();
             if rule.is_empty() {
@@ -105,28 +105,44 @@ impl RulesAddition {
                 if right == "." {
                     right = ""
                 }
-                info!("{} -> {}", left, right);
-                self.add_rules(left, right)
+                self.add_rules(left, right);
+
             }
         }
+
+        info!("--------------------------------");
+        info!("left rules: {:?}", self.left_rules);
+        info!("right rules: {:?}", self.right_rules);
         info!("--------------------------------");
     }
 
-    fn add_rules(&mut self, left_rule: &str, right_rule: &str) {
-        let size = self.left_rules.len();
-        self.left_rules.push(left_rule.to_string());
-        self.right_rules.push(right_rule.to_string());
+    fn add_rules(&mut self, left: &str, right: &str) {
+        if self.left_rules.is_empty() {
+            self.left_rules.push(left.to_string());
+            self.right_rules.push(right.to_string());
+            return;
+        }
 
-        for i in 0..size {
-            let left_clone = self.left_rules[i].clone();
-            let normal_forms = self.get_normal_forms(&left_clone, vec![]);
-            if normal_forms[0] != self.right_rules[i] {
-                self.right_rules[i] = normal_forms[0].clone();
+        let normsl =self.get_normal_forms(left, vec![], &mut HashMap::new());
+        let normsr = self.get_normal_forms(right, vec![], &mut HashMap::new());
+
+
+        if normsr[0] != normsl[0] {
+            if self.llo(&normsl[0], &normsr[0]) {
+                self.left_rules.push(normsr[0].clone());
+                self.right_rules.push(normsl[0].clone());
+            } else {
+                self.left_rules.push(normsl[0].clone());
+                self.right_rules.push(normsr[0].clone());
             }
         }
     }
 
-    fn get_normal_forms(&mut self, start: &str, mut history: Vec<String>) -> Vec<String> {
+    fn get_normal_forms(&mut self, start: &str, mut history: Vec<String>,  cache: &mut HashMap<String, Vec<String>>) -> Vec<String> {
+
+        if let Some(v) = cache.get(start) {
+            return v.clone();
+        }
         history.push(start.to_string());
         let mut normal_forms = vec![];
         let mut is_normal_form = true;
@@ -145,9 +161,8 @@ impl RulesAddition {
                 for index in indexes {
                     let mut new_start = start.to_string();
                     new_start.replace_range(index..index + left_rule.len(), &right_rule);
-
                     let new_history = history.clone();
-                    let more_normal_forms = self.get_normal_forms(&new_start, new_history);
+                    let more_normal_forms = self.get_normal_forms(&new_start, new_history, cache);
 
                     for form in more_normal_forms {
                         if !normal_forms.contains(&form) {
@@ -157,7 +172,6 @@ impl RulesAddition {
                 }
             }
         }
-
         if is_normal_form {
             normal_forms.push(start.to_string());
             self.history
@@ -178,24 +192,27 @@ impl RulesAddition {
     }
 
     fn reduction_rules(&mut self) {
-        let mut i = 0;
-        while i < self.left_rules.len() {
-            let start = self.left_rules[i].clone();
+        let mut size = self.left_rules.len();
+        let mut i = 0usize;
+        while i < size {
+            let starting = self.left_rules[i].clone();
             let left = self.left_rules[i].clone();
             let right = self.right_rules[i].clone();
 
             self.left_rules.remove(i);
             self.right_rules.remove(i);
 
-            let normal_forms = self.get_normal_forms(&start, vec![]);
-
+            let normal_forms = self.get_normal_forms(&starting, vec![], &mut HashMap::new());
             if !normal_forms.contains(&right) {
                 self.left_rules.insert(i, left);
                 self.right_rules.insert(i, right);
+                i += 1;
+            } else {
+                size -= 1;
             }
-            i += 1;
         }
     }
+
 
     fn gen_string(&self, number: usize, length: usize) -> String {
         if length == 0 {
@@ -205,7 +222,17 @@ impl RulesAddition {
         let letter = self.letters.get(&(number % self.alphabet_len)).unwrap();
         format!("{}{}", prev, letter)
     }
+
+    fn llo(&self, a: &str, b: &str) -> bool {
+        if a.len() != b.len() {
+            a.len() < b.len()
+        } else {
+            a < b
+        }
+    }
+
 }
+
 
 pub fn start_rules_additioner() {
     env_logger::init();
@@ -232,14 +259,12 @@ pub fn start_rules_additioner() {
             {
                 let gen_string = rules_addition.gen_string(i, rules_addition.cur_len);
                 rules_addition.history.clear();
-                let normal_forms = rules_addition.get_normal_forms(&gen_string, vec![]);
+                let normal_forms = rules_addition.get_normal_forms(&gen_string, vec![], &mut HashMap::new());
                 if normal_forms.len() != 1 {
                     cnt += 1;
-                    if gen_string == "ccc" {
-                        warn!("{gen_string} has more, than 1 normal form");
-                        for (key, val) in &rules_addition.history {
-                            info!("{}: {:?}", key, val)
-                        }
+                    warn!("{gen_string} has more, than 1 normal form");
+                    for (key, val) in &rules_addition.history {
+                        info!("{}: {:?}", key, val)
                     }
                     let mut sorted_normal_forms = normal_forms.clone();
                     sorted_normal_forms.sort_by(|a, b| {
@@ -255,17 +280,17 @@ pub fn start_rules_additioner() {
                     rules_addition.cur_len = 0;
                     break 'new;
                 } else {
-                    //info!("{} norm: {} -> {}", gen_string, gen_string, normal_forms[0]);
+                    info!("{} norm: {} -> {}", gen_string, gen_string, normal_forms[0]);
                 }
             }
 
             if cnt == 0 {
-                //info!("My job finished! Goodbye!");
+                info!("My job finished! Goodbye!");
                 break;
             }
 
             for (key, val) in &to_add {
-                //info!("Added rule {key} -> {val}")
+                info!("Added rule {key} -> {val}")
             }
 
             if to_add.is_empty() {
@@ -291,13 +316,16 @@ pub fn start_rules_additioner() {
                 } else {
                     writeln!(file, "{} -> .", left).unwrap();
                 }
-                //info!("{} -> {} written", left, right);
-            }
+                info!("{} -> {} written", left, right);
+                rules_addition.read_rules();
 
-            rules_addition.read_rules();
-            rules_addition.reduction_rules();
-            to_add.clear();
-            cnt = 0;
+                rules_addition.reduction_rules();
+
+                to_add.clear();
+                cnt = 0;
+            } else {
+                break;
+            }
         }
         rules_addition.cur_len += 1;
     }
