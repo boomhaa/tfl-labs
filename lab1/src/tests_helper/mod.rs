@@ -1,2 +1,2 @@
 pub mod fuzz_tests;
-pub mod invariants_tests;
+pub mod meta_tests;
