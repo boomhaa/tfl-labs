@@ -5,4 +5,5 @@ mod fuzzer;
 fn main() {
     env_logger::init();
     start_fuzzer();
+
 }
