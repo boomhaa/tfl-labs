@@ -1,0 +1,31 @@
+digraph {
+	rankdir = LR
+	node [shape=circle]
+	dummy [label = "", shape = none]
+ start [shape = point];
+ start -> "S";
+	F [shape = doublecircle]
+    S -> a [label = "a"];
+    S -> b [label = "b"];
+    S -> S [label = "c"];
+    a -> a [label = "a"]; // aa
+    b -> b [label = "b"]; // bb
+    a -> "a b" [label = "b"];
+    a -> S [label = "c"];
+    "a b" -> "a b a" [label = "a, B/epsilon"]
+    "a b" -> S [label = "c"];
+    "a b" -> "a b a" [label = "a, z_0/(A z_0)"]
+    "a b" -> "a b a" [label = "a, A/(A A)"]
+    "a b" -> "b" [label = "b"];
+    "a b a" -> "F" [label = "epsilon, A/epsilon"]
+    "a b a" -> "b a" [label = "epsilon"]
+    b -> "b a" [label = "a"];
+    b -> S [label = "c"];
+    "b a" -> "b a b" [label = "b, A/epsilon"]
+    "b a" -> "b a b" [label = "b, z_0/(B z_0)"]
+    "b a" -> "b a b" [label = "b, B/(B B)"]
+    "b a" -> "S" [label = "c"];
+    "b a" -> "a" [label = "a"];
+    "b a b" -> "F" [label = "epsilon, B/epsilon"]
+    "b a b" -> "a b" [label = "epsilon"]
+}
