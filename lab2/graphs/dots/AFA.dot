@@ -1,0 +1,104 @@
+digraph NFA_no_eps {
+rankdir = LR;
+node [shape = circle];
+__start [label = "", shape = none];
+__start -> "&";
+
+20 [shape = doublecircle];
+21 [shape = doublecircle];
+
+I4 [shape = doublecircle];
+I5   [shape = doublecircle];
+I6 [shape =doublecircle];
+I7 [shape = doublecircle];
+I8 [shape = doublecircle];
+I9 [shape= doublecircle];
+
+"&" -> 0 [label ="ε"]
+"&" -> I0 [label = "ε"]
+
+0 -> 1 [label = "a"];
+0 -> 2 [label = "b"];
+0 -> 5 [label = "b"];
+0 -> 10 [label = "b"];
+0 -> 11 [label = "b"];
+0 -> 16 [label= "b"];
+0 -> 3 [label ="c"];
+1 -> 0 [label = "a"];
+1 -> 4 [label = "a"];
+2 -> 0 [label = "b"];
+2 -> 4 [label = "b"];
+3 -> 0 [label = "c"];
+3 -> 4 [label = "c"];
+4 -> 5 [label = "b"];
+4 -> 10 [label = "b"];
+4 -> 11 [label= "b"];
+4 -> 16 [label ="b"];
+5 -> 6 [label = "a"];
+5 -> 12 [label = "a"];
+5 -> 15 [label = "a"];
+5 -> 17 [label = "a"];
+5 -> 8 [label = "b"];
+5 -> 13 [label = "b"];
+5 -> 14 [label = "c"];
+6 -> 7 [label = "a"];
+7 -> 5 [label= "a"];
+7 -> 10 [label ="a"];
+7 -> 11 [label = "a"];
+7 -> 16 [label = "a"];
+8 -> 9 [label = "b"];
+9 -> 5 [label = "b"];
+9 -> 10 [label = "b"];
+9 -> 11 [label = "b"];
+9 -> 16 [label = "b"];
+10 -> 12 [label = "a"];
+10 -> 15 [label= "a"];
+10 -> 17 [label ="a"];
+10 -> 13 [label = "b"];
+10 -> 14 [label = "c"];
+11 -> 12 [label = "a"];
+11 -> 15 [label = "a"];
+11 -> 13 [label = "b"];
+11 -> 14 [label = "c"];
+12 -> 11 [label = "b"];
+13 -> 11 [label = "c"];
+14 -> 13 [label= "c"];
+15 -> 10 [label ="a"];
+15 -> 11 [label = "a"];
+15 -> 16 [label = "a"];
+16 -> 17 [label = "a"];
+17 -> 18 [label = "b"];
+18 -> 19 [label = "c"];
+19 -> 20 [label = "a,b,c"];
+19 -> 21 [label = "a,b,c"];
+20 -> 21 [label = "b"];
+
+
+I0 -> I1 [label= "a"];
+I0 -> I0 [label ="b,c"];
+I1 -> I1 [label = "a"];
+I1 -> I2 [label = "b"];
+I1 -> I0 [label = "c"];
+I2 -> I1 [label = "a"];
+I2 -> I0 [label = "b"];
+I2 -> I3 [label = "c"];
+I3 -> I4 [label = "a"];
+I3 -> I5 [label = "b"];
+I3 -> I6 [label= "c"];
+I4 -> I1 [label ="a"];
+I4 -> I7 [label = "b"];
+I4 -> I0 [label = "c"];
+I5 -> I1 [label = "a"];
+I5 -> I8 [label = "b"];
+I5 -> I0 [label = "c"];
+I6 -> I1 [label = "a"];
+I6 -> I9 [label = "b"];
+I6 -> I0 [label = "c"];
+I7 -> I1 [label= "a"];
+I7 -> I0 [label ="b"];
+I7 -> I3 [label = "c"];
+I8 -> I1 [label = "a"];
+I8 -> I0 [label = "b,c"];
+I9 -> I1 [label = "a"];
+I9 -> I0 [label = "b,c"];
+}

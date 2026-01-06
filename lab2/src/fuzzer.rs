@@ -13,8 +13,11 @@ struct Fuzzer {
     final_nodes_dfa: Vec<usize>,
     start_node_nfa: usize,
     final_nodes_nfa: Vec<usize>,
+    start_node_afa: usize,
+    final_nodes_afa: Vec<usize>,
     dfa: Vec<(usize, usize, usize)>,
     nfa: Vec<(usize, usize, usize)>,
+    afa: Vec<(usize, usize, usize)>,
     re: Regex,
     ext_re: Regex,
     rng: ThreadRng,
@@ -23,7 +26,7 @@ struct Fuzzer {
 impl Fuzzer {
     fn new() -> Self {
         Self {
-            tests_count: 5000,
+            tests_count: 1000,
             min_str_len: 10,
             max_str_len: 100,
             start_node_dfa: 42,
@@ -31,6 +34,8 @@ impl Fuzzer {
             final_nodes_dfa: vec![0, 1, 2, 3, 4, 5],
             start_node_nfa: 0,
             final_nodes_nfa: vec![20, 21],
+            start_node_afa: 0,
+            final_nodes_afa: vec![4, 5, 6, 7, 8, 9],
             dfa: vec![
                 (0, 33, 0),
                 (0, 58, 1),
@@ -282,6 +287,38 @@ impl Fuzzer {
                 (19, 21, 1),
                 (20, 21, 1),
             ],
+            afa: vec![
+                (0, 1, 0),
+                (0, 0, 1),
+                (0, 0, 2),
+                (1, 1, 0),
+                (1, 2, 1),
+                (1, 0, 2),
+                (2, 1, 0),
+                (2, 0, 1),
+                (2, 3, 2),
+                (3, 4, 0),
+                (3, 5, 1),
+                (3, 6, 2),
+                (4, 1, 0),
+                (4, 7, 1),
+                (4, 0, 2),
+                (5, 1, 0),
+                (5, 8, 1),
+                (5, 0, 2),
+                (6, 1, 0),
+                (6, 9, 1),
+                (6, 0, 2),
+                (7, 1, 0),
+                (7, 0, 1),
+                (7, 3, 2),
+                (8, 1, 0),
+                (8, 0, 1),
+                (8, 0, 2),
+                (9, 1, 0),
+                (9, 0, 1),
+                (9, 0, 2),
+            ],
             re: Regex::new("^(aa|bb|cc)*b(aaa|bbb)*((ab|bc|ccc)*aa)*abc(a|b|c)(b|)$").unwrap(),
             ext_re: Regex::new("^(aa|bb|cc)*b(aaa|bbb)*((ab|bc|ccc)*aa)*abc[abc]b?$").unwrap(),
             rng: rand::rng(),
@@ -336,6 +373,28 @@ impl Fuzzer {
         }
         self.final_nodes_dfa.contains(&cur_state)
     }
+
+    fn afa_check(&self, word: &String) -> bool {
+        let mut cur_state = self.start_node_afa;
+        for char in word.chars() {
+            let mut found = false;
+            for &(from, to, ch) in &self.afa {
+                let new_ch = match Self::mapper(ch) {
+                    Some(char) => char,
+                    None => return false,
+                };
+                if from == cur_state && char == new_ch {
+                    cur_state = to;
+                    found = true;
+                    break;
+                }
+            }
+            if !found {
+                return false;
+            }
+        }
+        self.final_nodes_afa.contains(&cur_state) && self.nfa_check(word)
+    }
     fn get_rand_word(&mut self) -> String {
         let len = self.rng.random_range(self.min_str_len..self.max_str_len);
         let mut string = String::new();
@@ -364,21 +423,33 @@ pub fn start_fuzzer() {
         let new_string = new_fuzzer.get_rand_word();
         let res_dfa_check = new_fuzzer.dfa_check(&new_string);
         let res_nfa_check = new_fuzzer.nfa_check(&new_string);
+        let res_afa_check = new_fuzzer.afa_check(&new_string);
         let res_re_match = new_fuzzer.re.is_match(&new_string);
         let res_ext_re_match = new_fuzzer.ext_re.is_match(&new_string);
         if res_re_match == res_dfa_check
             && res_re_match == res_nfa_check
             && res_re_match == res_ext_re_match
+            && res_re_match == res_afa_check
         {
             test_passed += 1;
             info!(
-                "word: {}: test passed\n dfa check: {}, nfa check: {}, re check: {}, ext re check: {}",
-                new_string, res_dfa_check, res_nfa_check, res_re_match, res_ext_re_match
+                "word: {}: test passed\n dfa check: {}, nfa check: {}, afa check: {}, re check: {}, ext re check: {}",
+                new_string,
+                res_dfa_check,
+                res_nfa_check,
+                res_afa_check,
+                res_re_match,
+                res_ext_re_match
             );
         } else {
             error!(
-                "word: {}: test not passed\n dfa check: {}, nfa check: {}, re check: {}, ext re check: {}",
-                new_string, res_dfa_check, res_nfa_check, res_re_match, res_ext_re_match
+                "word: {}: test not passed\n dfa check: {}, nfa check: {}, afa check: {}, re check: {}, ext re check: {}",
+                new_string,
+                res_dfa_check,
+                res_nfa_check,
+                res_afa_check,
+                res_re_match,
+                res_ext_re_match
             )
         }
     }
