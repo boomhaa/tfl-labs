@@ -1,15 +1,15 @@
 digraph {
-	rankdir = LR
-	node [shape=circle]
-	dummy [label = "", shape = none]
- start [shape = point];
- start -> "S";
-	F [shape = doublecircle]
+    rankdir = LR
+    node [shape=circle]
+    dummy [label = "", shape = none]
+    start [shape = point];
+    start -> "S";
+    F [shape = doublecircle]
     S -> a [label = "a"];
     S -> b [label = "b"];
     S -> S [label = "c"];
-    a -> a [label = "a"]; // aa
-    b -> b [label = "b"]; // bb
+    a -> a [label = "a"];
+    b -> b [label = "b"];
     a -> "a b" [label = "b"];
     a -> S [label = "c"];
     "a b" -> "a b a" [label = "a, B/epsilon"]
@@ -18,6 +18,7 @@ digraph {
     "a b" -> "a b a" [label = "a, A/(A A)"]
     "a b" -> "b" [label = "b"];
     "a b a" -> "F" [label = "epsilon, A/epsilon"]
+    "a b a" -> "F" [label = "epsilon, B/epsilon"]
     "a b a" -> "b a" [label = "epsilon"]
     b -> "b a" [label = "a"];
     b -> S [label = "c"];
@@ -26,6 +27,21 @@ digraph {
     "b a" -> "b a b" [label = "b, B/(B B)"]
     "b a" -> "S" [label = "c"];
     "b a" -> "a" [label = "a"];
+    "b a b" -> "F" [label = "epsilon, A/epsilon"]
     "b a b" -> "F" [label = "epsilon, B/epsilon"]
     "b a b" -> "a b" [label = "epsilon"]
+    S -> F [label="epsilon, A/A"];
+    S -> F [label="epsilon, B/B"];
+    a -> F [label="epsilon, A/A"];
+    a -> F [label="epsilon, B/B"];
+    b -> F [label="epsilon, A/A"];
+    b -> F [label="epsilon, B/B"];
+    "a b" -> F [label="epsilon, A/A"];
+    "a b" -> F [label="epsilon, B/B"];
+    "b a" -> F [label="epsilon, A/A"];
+    "b a" -> F [label="epsilon, B/B"];
+    "a b a" -> F [label="epsilon, A/A"];
+    "a b a" -> F [label="epsilon, B/B"];
+    "b a b" -> F [label="epsilon, A/A"];
+    "b a b" -> F [label="epsilon, B/B"];
 }
