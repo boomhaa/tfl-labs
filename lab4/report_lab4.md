@@ -37,7 +37,7 @@ b\
 \underbrace{a^{p}}_{A_2}\;
 c\,
 \underbrace{a^{2p}}_{A_3}\;
-b\ a\
+ba\
 \underbrace{a^{p}}_{A_4}\;
 b\
 \underbrace{a^{p}}_{A_5}.
