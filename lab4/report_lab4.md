@@ -33,9 +33,13 @@ w = a^pba^aca^{2p}baa^pba^p
 Обозначим разные блоки степени `a` разными символами:
 ```math
 \underbrace{a^{p}}_{A_1}\;
-\underbrace{b\,a^{p}}_{A_2}\;
-\underbrace{c\,a^{2p}\,b}_{A_3}\;
-\underbrace{a^{p}\,b}_{A_4}\;
+b\
+\underbrace{a^{p}}_{A_2}\;
+c\,
+\underbrace{a^{2p}}_{A_3}\;
+b\ a\
+\underbrace{a^{p}}_{A_4}\;
+b\
 \underbrace{a^{p}}_{A_5}.
 ```
 
