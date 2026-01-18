@@ -69,6 +69,8 @@ impl Fuzzer {
 
         Чтобы попадать в нужный диапазон, подберем k по target_len,
         а если target_len не кратен, просто подберем ближайший k
+
+        комментарий писал сам, чтобы было понятно, как генерится слово из языка
          */
         let mut k = if target_len >= 5 { (target_len.saturating_sub(5)) / 6 } else { 1 };
         if k == 0 { k = 1; }
@@ -163,7 +165,6 @@ impl Fuzzer {
                 }
             }
 
-            // ветка "продолжить y"
             if pos < bs.len() && (bs[pos] == b'a' || bs[pos] == b'b') {
                 y_subword.push(bs[pos]);
                 if parse_y_subword(bs, pos + 1, x_subword, y_subword) {
