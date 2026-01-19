@@ -1,0 +1,67 @@
+digraph LL_approx {
+  rankdir=LR;
+  node [shape=circle];
+
+  __start [shape=point];
+  __start -> 0;
+
+  a2 [shape=doublecircle];
+  b4 [shape=doublecircle];
+  c5 [shape=doublecircle];
+  c7 [shape=doublecircle];
+
+  0 -> a1  [label="a"];
+  0 -> b3  [label="b"];
+  0 -> c6  [label="c"];
+  0 -> c8  [label="c"];
+  0 -> a10 [label="a"];
+  0 -> c12 [label="c"];
+
+  a1 -> a1  [label="a"];
+  a1 -> b3  [label="b"];
+  a1 -> c6  [label="c"];
+  a1 -> c8  [label="c"];
+  a1 -> a10 [label="a"];
+  a1 -> c12 [label="c"];
+
+  b3 -> a1  [label="a"];
+  b3 -> b3  [label="b"];
+  b3 -> c6  [label="c"];
+  b3 -> c8  [label="c"];
+  b3 -> a10 [label="a"];
+  b3 -> c12 [label="c"];
+
+  a2 -> a2 [label="a"];
+  a2 -> b4 [label="b"];
+
+  b4 -> a2 [label="a"];
+  b4 -> b4 [label="b"];
+
+  c5 -> a2 [label="a"];
+  c5 -> b4 [label="b"];
+
+  c7 -> a2 [label="a"];
+  c7 -> b4 [label="b"];
+
+  c8 -> c8  [label="c"];
+  c8 -> a10 [label="a"];
+  c8 -> c12 [label="c"];
+  c8 -> a9  [label="a"];
+  c8 -> c7  [label="c"];
+
+  c6 -> c8 [label="c"];
+  c6 -> a9 [label="a"];
+  c6 -> c7 [label="c"];
+
+  a9 -> a9 [label="a"];
+  a9 -> c7 [label="c"];
+
+  a10 -> a10 [label="a"];
+  a10 -> c12 [label="c"];
+
+  c12 -> a11 [label="a"];
+  c12 -> c5  [label="c"];
+
+  a11 -> a11 [label="a"];
+  a11 -> c5  [label="c"];
+}
